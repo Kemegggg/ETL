@@ -144,25 +144,6 @@ else if (details.indexOf('SALARY') >= 0)      transaction_type = 'Salary';
 else                                           transaction_type = 'Other';
 ```
 
-Результаты классификации:
-
-| Тип транзакции | Количество | % от общего |
-|---|---|---|
-| Other | 54 282 | 47,7% |
-| Internal Transfer | 16 871 | 14,8% |
-| Transfer | 12 110 | 10,7% |
-| NEFT Transfer | 9 155 | 8,1% |
-| IMPS Transfer | 8 959 | 7,9% |
-| RTGS Transfer | 6 562 | 5,8% |
-| POS Payment | 2 387 | 2,1% |
-| Cheque | 2 086 | 1,8% |
-| ATM Withdrawal | 1 061 | 0,9% |
-| Interest Collection | 113 | 0,1% |
-| ECS/ACH Payment | 70 | 0,1% |
-| Salary | 41 | 0,0% |
-| Interest | 5 | 0,0% |
-| **ИТОГО** | **113 702** | **100%** |
-
 ### Шаг 5 — Load to PostgreSQL
 
 Тип компонента: `Table Output (TableOutput)`
@@ -255,6 +236,29 @@ ORDER BY COUNT(*) DESC;
 Сумма всех значений = **113 702** — соответствует результату первого запроса, потерь данных нет.
 
 ---
+### Архитектура ktr файла в Pentaho
+<img width="1147" height="818" alt="image-75" src="https://github.com/user-attachments/assets/ca957998-b210-4aae-9126-57b832edaf09" />
+
+### Read Excel bank // Files
+<img width="1053" height="501" alt="image-76" src="https://github.com/user-attachments/assets/e61ac802-0e37-4a22-a8fc-9a85452eafa3" />
+
+### Read Excel bank // Fields
+<img width="1050" height="497" alt="image-77" src="https://github.com/user-attachments/assets/cf4e839d-a0c4-49fe-9ce9-4bf22251fdc6" />
+
+### Filter empty Transactions - настройки
+<img width="738" height="386" alt="image-78" src="https://github.com/user-attachments/assets/2e619fa2-ff56-4109-ad69-dc543fe3f00b" />
+
+### Modified JavaScript value - скрипт
+<img width="918" height="806" alt="image-79" src="https://github.com/user-attachments/assets/0a2d3d6a-dd45-4d36-a641-74c30ba47c41" />
+
+### Настройки подключения базы данных и тест подключения 
+<img width="1018" height="752" alt="image-80" src="https://github.com/user-attachments/assets/b9995df4-5d5f-46fb-9c2b-1e35389edb5d" />
+
+<img width="925" height="535" alt="image-81" src="https://github.com/user-attachments/assets/facefb87-998f-4a93-80c8-bc2d804fe898" />
+
+### Успешный запуск
+<img width="1244" height="814" alt="image-82" src="https://github.com/user-attachments/assets/25286253-bfc6-498f-ad9a-7e6482dca09e" />
+
 
 ## Выводы
 
