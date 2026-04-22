@@ -20,13 +20,13 @@
 | service_regulations.xlsx | Excel | 25 | 5 |
 | support_quality.csv | CSV | 60 | 5 |
 
-![Скриншот 1 — Данные в PostgreSQL](screenshots/01_postgresql_data.png)
+<img width="1187" height="233" alt="image-100" src="https://github.com/user-attachments/assets/d4d41d17-652d-47c7-ad6e-70128e66ed6c" />
 *Терминал: `docker exec postgres_etl psql -U etl_user -d etl_db -c "SELECT * FROM support_tickets LIMIT 10;"`*
 
-![Скриншот 2 — Excel файл](screenshots/02_excel_data.png)
+<img width="339" height="449" alt="image-101" src="https://github.com/user-attachments/assets/345b703f-3fba-4e98-8917-2906a20b9986" />
 *Открытый файл service_regulations.xlsx — видны колонки: regulation_id, category, response_time_hours, resolution_time_hours, priority*
 
-![Скриншот 3 — CSV файл](screenshots/03_csv_data.png)
+<img width="641" height="191" alt="image-102" src="https://github.com/user-attachments/assets/fa090bfc-42bd-44e7-9fdd-7859c03a7fc7" />
 *Терминал: `head -10 ~/Downloads/lab_03/support_quality.csv`*
 
 ---
@@ -146,10 +146,11 @@ if __name__ == '__main__':
     main()
 ```
 
-![Скриншот 4 — Запуск скрипта](screenshots/04_script_run.png)
+<img width="1376" height="824" alt="image-103" src="https://github.com/user-attachments/assets/9f33c263-5b53-45f4-9535-84a7c3f11ec7" />
 *Терминал: `python etl_support.py` — вывод логов всех 6 шагов*
 
-![Скриншот 5 — Лог выполнения](screenshots/05_log.png)
+
+<img width="719" height="174" alt="image-104" src="https://github.com/user-attachments/assets/1330b7d8-3e78-4156-a5e7-4fc1e7bdd18d" />
 *Терминал: `cat ~/Downloads/lab_03/etl_support.log` — временные метки и статус каждого шага*
 
 ---
@@ -158,10 +159,10 @@ if __name__ == '__main__':
 
 После объединения трёх источников получена итоговая таблица **120 строк, 15 колонок**, сохранённая в PostgreSQL как `integrated_support_data`.
 
-![Скриншот 6 — Итоговая таблица в PostgreSQL](screenshots/06_integrated_table.png)
+<img width="1469" height="406" alt="image-105" src="https://github.com/user-attachments/assets/4f9b6b84-16a1-4d83-89eb-ef2167ef048d" />
 *Терминал: `docker exec postgres_etl psql -U etl_user -d etl_db -c "SELECT * FROM integrated_support_data LIMIT 10;"`*
 
-![Скриншот 7 — Статистика обработки](screenshots/07_stats.png)
+<img width="199" height="87" alt="image-106" src="https://github.com/user-attachments/assets/a3e849d4-9eff-4f2c-b55e-d7a854768533" />
 *Итоговая статистика в терминале: строки по источникам, время выполнения*
 
 ---
@@ -183,24 +184,25 @@ if __name__ == '__main__':
 | Network | 14.42 | 11.40 | ❌ +3.02ч |
 | Technical | 19.01 | 20.34 | ✅ в срок |
 
-![Скриншот 8 — Рейтинг агентов](screenshots/08_agent_rating.png)
+<img width="1200" height="600" alt="image-107" src="https://github.com/user-attachments/assets/fe574ee0-841a-40bf-b0db-33d5f95a53b7" />
 *Файл: plots/plot1_agent_rating.png — горизонтальный bar chart, красная линия = среднее*
 
-![Скриншот 9 — Время решения vs регламент](screenshots/09_resolution_time.png)
+<img width="1200" height="600" alt="image-108" src="https://github.com/user-attachments/assets/da39624c-6c76-4322-b8b1-492b3db24280" />
 *Файл: plots/plot2_resolution_time.png — сгруппированный bar chart факт vs регламент*
 
-![Скриншот 10 — Распределение по приоритетам](screenshots/10_priority_pie.png)
+<img width="840" height="840" alt="image-109" src="https://github.com/user-attachments/assets/2fa95cc0-f7c1-492f-85cd-807257bc5dd1" /
 *Файл: plots/plot3_priority_pie.png — круговая диаграмма приоритетов*
 
-![Скриншот 11 — Динамика обращений](screenshots/11_daily_trend.png)
+<img width="1440" height="600" alt="image-110" src="https://github.com/user-attachments/assets/5574c966-45d7-4483-8b30-fcf25d92310e" />
 *Файл: plots/plot4_daily_trend.png — линейный график по датам 2024*
 
 ---
 
 ## Структура проекта
+<img width="872" height="842" alt="image-111" src="https://github.com/user-attachments/assets/fd2e4f1b-2b90-40f0-a4f8-50262cc8dc5f" />
 
-![Скриншот 12 — Структура файлов](screenshots/12_project_structure.png)
-*Терминал: `ls -la ~/Downloads/lab_03/ && ls -la ~/Downloads/lab_03/plots/`*
+<img width="709" height="665" alt="image-112" src="https://github.com/user-attachments/assets/c267c395-32fb-4d3d-bd71-311989b30578" />
+
 
 ```
 lab_03/
