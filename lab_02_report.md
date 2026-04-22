@@ -24,21 +24,6 @@
 
 ### 2.1 Схема Job
 
-```
-START
-  └─[unconditional]─► Set Variables
-                           └─[success]─► Check File Exists
-                                              ├─[success]─► Prep Orders Table
-                                              │                  └─[success]─► Load Orders (lab_02_1)
-                                              │                                      └─[success]─► Fix Orders Types
-                                              │                                                         └─[success]─► Load Customers (lab_02_2)
-                                              │                                                                             └─[success]─► Load Products (lab_02_3)
-                                              │                                                                                                 └─[success]─► Analytics 1 Discount (lab_02_4)
-                                              │                                                                                                                     └─[success]─► Analytics 2 Regions (lab_02_5)
-                                              │                                                                                                                                         └─[success]─► SUCCESS
-                                              └─[failure]─► Error (Write to log)
-```
-
 **Описание шагов Job:**
 
 | Шаг | Тип | Назначение |
@@ -56,24 +41,17 @@ START
 | Analytics 2 Regions | Transformation | Запускает `lab_02_5_region_report.ktr` (доп. задание 2) |
 | SUCCESS | Success | Завершение Job при успешном выполнении всех шагов |
 
-![Скриншот 1 — Общий вид Job в Spoon](screenshots/01_job_overview.png)
 *На скриншоте: canvas с job, все шаги соединены стрелками, зелёные галочки на каждом шаге после успешного запуска*
+<img width="1464" height="808" alt="image-83" src="https://github.com/user-attachments/assets/c100fa2e-cc73-48af-8997-7e1be6ea276d" />
+
+<img width="1242" height="801" alt="image-84" src="https://github.com/user-attachments/assets/9b687a49-90f8-4767-8e97-943465682bb2" />
+
 
 ---
 
 ### 2.2 Схема трансформаций
 
 **Трансформация 1 — lab_02_1_csv_orders.ktr (Заказы):**
-```
-CSV file input
-    └─► Select values (переименование колонок в snake_case)
-              └─► Memory group by (дедупликация по row_id)
-                        └─► Filter rows (data check) ──[true]──► Value mapper (Yes/No → 1/0)
-                                                                        └─► Convert returned type (String → Integer)
-                                                                                  └─► Filter rows (country = United States)
-                                                                                              └─► Table output → orders
-                                    └─[false]──► Write to log (строки с пустыми датами)
-```
 
 **Трансформация 2 — lab_02_2_csv_customers.ktr (Клиенты):**
 ```
@@ -152,46 +130,16 @@ CSV file input
 ## 4. Описание компонентов трансформаций
 
 ### 4.1 Трансформация 1: lab_02_1_csv_orders.ktr
+<img width="1199" height="409" alt="image-85" src="https://github.com/user-attachments/assets/10c449bc-14fe-4534-b36d-a3901d095eb0" />
 
-![Скриншот 2 — Трансформация 1: общий вид](screenshots/02_transform1_overview.png)
-*На скриншоте: canvas трансформации, все шаги и стрелки между ними*
+<img width="948" height="353" alt="image-86" src="https://github.com/user-attachments/assets/0ce43f1d-1800-4b40-9831-ba545b13de7e" />
 
-#### CSV file input
-Читает файл `samplestore-general.csv`. Разделитель — `;`, кодировка — UTF-8, первая строка — заголовок. Для полей `Order Date` и `Ship Date` задан формат `dd/MM/yyyy`, для числовых полей (Sales, Quantity, Discount, Profit) — числовые форматы.
+<img width="689" height="458" alt="image-87" src="https://github.com/user-attachments/assets/e152c954-1663-45a0-a806-1f4ea9175ace" />
 
-![Скриншот 3 — Трансформация 1: настройки CSV Input](screenshots/03_csv_input.png)
-*На скриншоте: диалог CSV Input — путь к файлу, разделитель, список полей с типами*
-
-#### Select values
-Переименовывает колонки из формата "Title Case" в snake_case для соответствия схеме БД:
-
-| Исходное имя | Новое имя |
-|-------------|----------|
-| Row ID | row_id |
-| Order Date | order_date |
-| Ship Date | ship_date |
-| Ship Mode | ship_mode |
-| Sales | sales |
-| Quantity | quantity |
-| Discount | discount |
-| Profit | profit |
-| Returned | returned |
-| Country | country |
-
-Также через error handling подключён шаг `Dummy (do nothing)` — перехватывает строки с ошибками преобразования типов.
-
-![Скриншот 4 — Трансформация 1: настройки Select Values](screenshots/04_select_values.png)
 *На скриншоте: диалог Select Values, вкладка Select & Alter с маппингом полей*
 
-#### Memory group by
-Выполняет дедупликацию заказов по полю `row_id`. Для всех остальных полей применяется агрегация `FIRST` (берётся первое встреченное значение в группе). Это гарантирует, что каждый `row_id` встречается в таблице `orders` ровно один раз.
+<img width="431" height="180" alt="image-88" src="https://github.com/user-attachments/assets/761b2dbc-ea49-4c93-a87d-4cd9ffc91067" />
 
-| Поле группировки | Агрегируемые поля (FIRST) |
-|-----------------|--------------------------|
-| row_id | order_date, ship_date, ship_mode, country, sales, quantity, discount, profit, returned |
-
-![Скриншот 5 — Трансформация 1: настройки Memory Group By](screenshots/05_memory_group_by.png)
-*На скриншоте: диалог Memory Group By — поле группировки row_id, список агрегатов*
 
 #### Filter rows (data check)
 Проверяет качество данных: пропускает строки только при условии, что обе даты не пустые.
@@ -200,20 +148,10 @@ CSV file input
 - **True →** Value mapper (строка корректна)
 - **False →** Write to log (строка с пустой датой логируется и отбрасывается)
 
-![Скриншот 6 — Трансформация 1: настройки Filter Rows (даты)](screenshots/06_filter_dates.png)
 *На скриншоте: диалог Filter Rows с условием проверки дат*
 
-#### Value mapper
-Преобразует текстовые значения поля `returned` в числовые коды:
+<img width="738" height="375" alt="image-89" src="https://github.com/user-attachments/assets/78a0d64e-4082-4cb1-a5d9-87965fb5a7c1" />
 
-| Исходное значение | Результат |
-|------------------|----------|
-| Yes | 1 |
-| No | 0 |
-| (пустое) | 0 |
-
-![Скриншот 7 — Трансформация 1: настройки Value Mapper](screenshots/07_value_mapper.png)
-*На скриншоте: диалог Value Mapper — маппинг Yes→1, No→0*
 
 #### Convert returned type (Modified JavaScript Value)
 Конвертирует поле `returned` из типа String в Integer с помощью JavaScript:
@@ -223,37 +161,16 @@ if (isNaN(returned)) returned = 0;
 ```
 Выходной тип поля — Integer. Все остальные поля передаются без изменений.
 
-#### Filter rows (country) — Вариант 10
-Реализует основной фильтр варианта 10: пропускает только заказы из United States.
-
-- **Условие:** `country = "United States"`
-- **True →** Table output
-- **False →** (строка отбрасывается)
-
-![Скриншот 8 — Трансформация 1: фильтр United States](screenshots/08_filter_us.png)
-*На скриншоте: диалог Filter Rows с условием country = "United States"*
-
-#### Table output → orders
-Записывает отфильтрованные заказы в таблицу `orders`. Настройки:
-- **Truncate table:** Yes (очищает таблицу перед загрузкой)
-- **Commit size:** 1000
-- **Use batch update:** Yes
-- **Specify database fields:** Yes
-
-Маппинг полей: row_id, order_date, ship_date, ship_mode, sales, quantity, discount, profit, returned.
-
-![Скриншот 9 — Трансформация 1: настройки Table Output](screenshots/09_table_output_orders.png)
-*На скриншоте: диалог Table Output — подключение postgres_etl, таблица orders, маппинг полей*
-
-![Скриншот 10 — Подключение к PostgreSQL: Connection tested successfully](screenshots/10_db_connection.png)
-*На скриншоте: диалог Database Connection — тип PostgreSQL, host localhost:5432, сообщение "Connection to database [etl_db] is OK"*
+<img width="913" height="670" alt="image-90" src="https://github.com/user-attachments/assets/49f87dae-b494-4a91-b389-b90767a41601" />
 
 ---
 
 ### 4.2 Трансформация 2: lab_02_2_csv_customers.ktr
 
-![Скриншот 11 — Трансформация 2: общий вид](screenshots/11_transform2_overview.png)
-*На скриншоте: canvas трансформации — CSV file input → Select values → Memory group by → Table output*
+<img width="893" height="349" alt="image-91" src="https://github.com/user-attachments/assets/ca2b4449-c0bc-436f-9822-e41417f807d8" />
+
+<img width="890" height="288" alt="image-92" src="https://github.com/user-attachments/assets/e03ac10f-a44d-4752-adc0-f8a7de815724" />
+
 
 #### CSV file input
 Читает тот же файл `samplestore-general.csv`. Все поля считываются как String (типизация не нужна, так как в таблицу `customers` идут только текстовые поля).
@@ -282,8 +199,11 @@ if (isNaN(returned)) returned = 0;
 
 ### 4.3 Трансформация 3: lab_02_3_csv_products.ktr
 
-![Скриншот 12 — Трансформация 3: общий вид](screenshots/12_transform3_overview.png)
-*На скриншоте: canvas трансформации — CSV file input → Select values → Memory group by → Table output*
+<img width="821" height="352" alt="image-93" src="https://github.com/user-attachments/assets/502d09e9-22aa-4281-8b31-1863dc430151" />
+
+<img width="878" height="286" alt="image-94" src="https://github.com/user-attachments/assets/b21be8ea-f0f4-4d15-9e6f-41c91c9c5b4b" />
+
+<img width="1253" height="757" alt="image-95" src="https://github.com/user-attachments/assets/26cdc8d5-c9f4-41c6-9ab0-855793f7c981" />
 
 #### CSV file input
 Читает `samplestore-general.csv`, все поля — String.
@@ -327,20 +247,6 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE INDEX IF NOT EXISTS idx_order_date ON orders (order_date);
 CREATE INDEX IF NOT EXISTS idx_ship_date  ON orders (ship_date);
 
--- Таблица клиентов
-CREATE TABLE IF NOT EXISTS customers (
-    id            SERIAL PRIMARY KEY,
-    customer_id   VARCHAR(20) NOT NULL,
-    customer_name VARCHAR(100),
-    segment       VARCHAR(50),
-    country       VARCHAR(100),
-    city          VARCHAR(100),
-    state         VARCHAR(100),
-    postal_code   VARCHAR(20),
-    region        VARCHAR(50),
-    CONSTRAINT unique_customer UNIQUE (customer_id)
-);
-
 CREATE INDEX IF NOT EXISTS idx_region ON customers (region);
 
 -- Таблица продуктов
@@ -381,34 +287,8 @@ CREATE TABLE IF NOT EXISTS region_report (
 
 ## 6. Проверочные SQL запросы
 
-### 6.1 Количество строк в таблицах
+<img width="574" height="314" alt="image-96" src="https://github.com/user-attachments/assets/c920da2f-33eb-438b-8862-98c4f22f1eec" />
 
-```sql
-SELECT 'orders'            AS table_name, COUNT(*) AS row_count FROM orders
-UNION ALL
-SELECT 'customers',                        COUNT(*)              FROM customers
-UNION ALL
-SELECT 'products',                         COUNT(*)              FROM products
-UNION ALL
-SELECT 'discount_analysis',                COUNT(*)              FROM discount_analysis
-UNION ALL
-SELECT 'region_report',                    COUNT(*)              FROM region_report;
-```
-
-**Результат:**
-
-| table_name | row_count |
-|-----------|----------|
-| orders | 9 994 |
-| customers | 793 |
-| products | 1 862 |
-| discount_analysis | 12 |
-| region_report | 4 |
-
-![Скриншот 14 — SQL: COUNT по таблицам](screenshots/14_sql_count.png)
-*На скриншоте: результат выполнения запроса в psql или pgAdmin — 5 строк с количеством записей*
-
----
 
 ### 6.2 Доп. задание 1 — Анализ скидок
 
@@ -443,8 +323,9 @@ ORDER BY discount;
 
 **Вывод:** скидки от 30% и выше приводят к отрицательной средней прибыли. Наибольшее количество заказов (4798) — без скидки.
 
-![Скриншот 15 — SQL: Анализ скидок](screenshots/15_sql_discounts.png)
+
 *На скриншоте: результат запроса к таблице discount_analysis — 12 строк с группировкой по уровню скидки*
+<img width="569" height="344" alt="image-97" src="https://github.com/user-attachments/assets/50eb37b4-3c36-4ad1-b2db-87c1219f6236" />
 
 ---
 
@@ -473,15 +354,16 @@ ORDER BY total_sales DESC;
 
 **Вывод:** регион West лидирует по объёму продаж ($725K) и прибыли ($108K). Регион Central имеет самую высокую среднюю скидку (16.5%) при наименьшей прибыли среди топ-3.
 
-![Скриншот 16 — SQL: Отчёт по регионам](screenshots/16_sql_regions.png)
 *На скриншоте: результат запроса к таблице region_report — 4 строки с агрегатами по регионам*
+<img width="576" height="219" alt="image-98" src="https://github.com/user-attachments/assets/033a8616-61ff-49d3-9c53-361ca9a99f02" />
 
 ---
 
 ## 7. Запуск Job и результаты выполнения
 
-![Скриншот 13 — Запуск Job: зелёные галочки](screenshots/13_job_run_success.png)
 *На скриншоте: лог выполнения Job в Spoon — все шаги завершены с result=[true], сообщение "Job execution finished"*
+<img width="1057" height="826" alt="image-99" src="https://github.com/user-attachments/assets/0152a9b5-a9f0-4cd7-bf7c-2a16b5db7129" />
+
 
 **Лог успешного выполнения Job:**
 ```
@@ -499,19 +381,10 @@ Starting entry [Analytics 2 Regions]    → result=[true]  (Written: 4)
 Job execution finished
 ```
 
+
 ---
 
 ## 8. Выводы
-
-### 8.1 Что изучили
-
-В ходе выполнения лабораторной работы были получены практические навыки:
-
-- **Динамические соединения:** настройка подключения к PostgreSQL через Pentaho, использование переменных (`CSV_FILE_PATH`) для параметризации путей к файлам
-- **Job-оркестрация:** создание Job с разветвлённой логикой — проверка файла, последовательный запуск трансформаций, обработка ошибок через ветви success/failure
-- **Обработка дублей:** применение шага `Memory group by` для дедупликации по первичному ключу (row_id, customer_id, product_id)
-- **Обработка ошибок:** шаги `Filter rows` (некорректные даты → Write to log) и `Dummy (do nothing)` (перехват ошибок преобразования типов)
-- **Трансформация данных:** переименование полей (snake_case), маппинг значений (Value mapper), фильтрация по стране (FilterRows)
 
 ### 8.2 Результаты загрузки
 
@@ -536,14 +409,3 @@ Job execution finished
 - Наименьший объём: **South** ($391K), но лучшее соотношение прибыли к продажам среди регионов с небольшим объёмом
 - Регион **Central** имеет самую высокую среднюю скидку (16.5%) при низкой прибыли ($39K) — возможная зона оптимизации
 
-### 8.4 Отличия от лабораторной работы 1
-
-| Аспект | Лаб. работа 1 | Лаб. работа 2 |
-|--------|--------------|--------------|
-| Инструмент | Установка и настройка PDI | ETL-процесс с Job |
-| Подключение | Одиночное подключение | Динамические соединения через переменные |
-| Оркестрация | Одиночная трансформация | Job с последовательностью трансформаций |
-| Обработка ошибок | Базовая | Разветвлённая (FilterRows + Write to log + Dummy) |
-| Дедупликация | Не рассматривалась | Memory group by по первичным ключам |
-| Аналитика | Загрузка данных | Загрузка + аналитические трансформации |
-| Таблиц в БД | 1 | 5 (3 основных + 2 аналитических) |
